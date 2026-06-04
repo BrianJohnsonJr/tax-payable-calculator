@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Tax Calculator AWS SAM Application"
+
+Globals: 
+  Function: 
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 128
+    Architectures: 
+      - x86_64
+
+Resources:
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/src
+      Handler: handlers.health.lambda_handler
+      Events:
+        HealthApi:
+          Type: Api
+          Properties: 
+            Path: /health
+            Method: get
+
+Outputs:
+  HealthUrl:
+    Description: Invoke URL for the health check
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/health
