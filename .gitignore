@@ -4,6 +4,7 @@ __pycache__/
 .aws-sam/
 .env
 *.csv
+!tax_rate_by_category.csv
 node_modules/
 frontend/build/
 .pytest_cache/
