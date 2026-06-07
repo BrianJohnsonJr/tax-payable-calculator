@@ -31,7 +31,7 @@ jobs:
                 aws-region: us-east-1
             
             - run: sam build -t infra/template.yaml
-            - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+            - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --parameter-overrides OpenAiApiKey=${{ secrets.OPENAI_API_KEY }}
 
 
 
