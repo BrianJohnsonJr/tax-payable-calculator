@@ -47,7 +47,7 @@ Resources:
         - DynamoDBReadPolicy:
             TableName: !Ref TaxCategoriesTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref TaxCategoriesTable
+            TableName: !Ref InvoicesTable
       Events:
         InvoiceUploaded:
           Type: S3
