@@ -6,10 +6,16 @@ class InvoiceAgent:
     def __init__(self, client):
         self.client = client
         
-    def process(self, invoice_text, categories):
+    def process(self, images, categories):
+        user_content = [{"type": "text", "text": "Here is the invoice. Extract and categorize every line item."}]
+        for img in images:
+            user_content.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/png;base64,{img}"},
+            })
         messages = [
             {"role": "system", "content": build_system_prompt(categories)},
-            {"role": "user", "content": invoice_text},
+            {"role": "user", "content": user_content},
         ]
         
         for i in range(10):
