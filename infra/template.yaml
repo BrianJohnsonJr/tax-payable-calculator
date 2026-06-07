@@ -16,6 +16,11 @@ Globals:
     Architectures: 
       - x86_64
 
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowMethods: "'*'"
+
 Resources:
   HealthFunction:
     Type: AWS::Serverless::Function
@@ -55,6 +60,37 @@ Resources:
             Bucket: !Ref InvoiceBucket
             Events: s3:ObjectCreated:*
 
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/src
+      Handler: handlers.api.lambda_handler
+      Environment:
+        Variables:
+          INVOICES_TABLE: !Ref InvoicesTable
+          INVOICE_BUCKET: !Sub "${AWS::StackName}-invoices-${AWS::AccountId}"
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref InvoicesTable
+        - S3WritePolicy:
+            BucketName: !Sub "${AWS::StackName}-invoices-${AWS::AccountId}"
+      Events:
+        CreateUpload:
+          Type: Api
+          Properties:
+            Path: /uploads
+            Method: post
+        ListInvoices:
+          Type: Api
+          Properties:
+            Path: /invoices
+            Method: get
+        GetInvoice:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}
+            Method: get
+
   InvoiceBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -91,6 +127,10 @@ Outputs:
   HealthUrl:
     Description: Invoke URL for the health check
     Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/health
+
+  ApiUrl:
+    Description: Invoke URL for the api check
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
 
   InvoiceBucketName:
     Description: Referencing Invoice Bucket
