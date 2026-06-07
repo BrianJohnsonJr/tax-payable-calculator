@@ -43,7 +43,7 @@ Resources:
           OPENAI_API_KEY: !Ref OpenAiApiKey
       Policies:
         - S3ReadPolicy:
-            BucketName: !Ref InvoiceBucket
+            BucketName: !Sub "${AWS::StackName}-invoices-${AWS::AccountId}"
         - DynamoDBReadPolicy:
             TableName: !Ref TaxCategoriesTable
         - DynamoDBCrudPolicy:
@@ -58,6 +58,7 @@ Resources:
   InvoiceBucket:
     Type: AWS::S3::Bucket
     Properties:
+      BucketName: !Sub "${AWS::StackName}-invoices-${AWS::AccountId}"
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
