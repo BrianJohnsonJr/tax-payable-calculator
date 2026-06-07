@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: "Tax Calculator AWS SAM Application"
 
+Parameters:
+  OpenAiApiKey:
+    Type: String
+    NoEcho: true
+    Description: OpenAI API key for the agent
+
 Globals: 
   Function: 
     Runtime: python3.12
@@ -22,6 +28,32 @@ Resources:
           Properties: 
             Path: /health
             Method: get
+
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties: 
+      CodeUri: ../backend/src
+      Handler: handlers.processor.lambda_handler
+      Timeout: 300
+      MemorySize: 1024
+      Environment:
+        Variables:
+          TAX_CATEGORIES_TABLE: !Ref TaxCategoriesTable
+          INVOICES_TABLE: !Ref InvoicesTable
+          OPENAI_API_KEY: !Ref OpenAiApiKey
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref InvoiceBucket
+        - DynamoDBReadPolicy:
+            TableName: !Ref TaxCategoriesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TaxCategoriesTable
+      Events:
+        InvoiceUploaded:
+          Type: S3
+          Properties:
+            Bucket: !Ref InvoiceBucket
+            Events: s3:ObjectCreated:*
 
   InvoiceBucket:
     Type: AWS::S3::Bucket
@@ -53,7 +85,6 @@ Resources:
       KeySchema:
         - AttributeName: invoiceId
           KeyType: HASH
-
 
 Outputs:
   HealthUrl:
