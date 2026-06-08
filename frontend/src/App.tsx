@@ -47,13 +47,13 @@ function App() {
   }
 
   return (
-    <>
+    <div className="app">
       <h1>Invoice Tax Calculator </h1>
       <input type="file" onChange={e=> setFile(e.target.files?.[0] ?? null)}/>
       <button onClick={handleUpload} disabled={!file}>Upload</button>
-      <p>{status}</p>
+      <p className="status">{status}</p>
       {invoice && (
-        <div>
+        <div className="result">
           <h2>{invoice.vendor}</h2>
           <p>Status: {invoice.status}</p>
           <table>
@@ -78,11 +78,11 @@ function App() {
               ))}
             </tbody>
           </table>
-          <p>Total tax: {invoice.total_tax}</p>
+          <p className="total">Total tax: {invoice.total_tax}</p>
           {invoice.override_reason && <p>Override: {invoice.override_reason}</p>}
         </div>
       )}
-    </>
+    </div>
   )
 }
 export default App
