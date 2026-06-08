@@ -2,6 +2,21 @@
 
 An agentic service that reads vendor invoices, matches each line item to a tax category, and calculates the tax payable. It was built for the RetailCo scenario, where invoices show up in all kinds of formats including clean PDFs, scanned documents, and handwritten pages.
 
+## Live demo
+
+The app is deployed and running. You can test it in the browser here:
+
+**https://d3vtsj33g291rz.cloudfront.net**
+
+To try it:
+
+1. Open the link above.
+2. Click **Choose File** and pick an invoice (PDF or image).
+3. Click **Upload**. The status moves through `uploading`, then `processing`, then `done`.
+4. After about ten seconds the results appear: the vendor, each line item with its category and tax, and the total tax payable.
+
+The processor is generic, so it works on invoices it has never seen before. The frontend is a React app hosted on S3 and served over HTTPS through CloudFront. Uploads go straight to S3 through a presigned URL, which triggers the processing pipeline described below.
+
 ## How it works
 
 A user uploads an invoice file to an S3 bucket. That upload triggers a Lambda function that does the following:
