@@ -101,6 +101,14 @@ Resources:
         IgnorePublicAcls: true
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+        - AllowedOrigins:
+            - "*"
+          AllowedMethods:
+            - PUT
+          AllowedHeaders:
+            - "*"
 
   TaxCategoriesTable:
     Type: AWS::DynamoDB::Table

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 
-type LineItem = {description: string; category: string; amount: string; tax_rate: string; tax_amount: string; vendor: string}
+type LineItem = {description: string; category: string; amount: string; tax_rate: string; tax_amount: string}
 type Invoice = { invoiceId: string; vendor: string; status: string; tax_applied: boolean; total_tax: string; override_reason: string | null; line_items: LineItem[] }
 const API = "https://fmskteyovd.execute-api.us-east-1.amazonaws.com/Prod"
 
@@ -9,6 +9,42 @@ function App() {
   const [file, setFile] = useState<File | null>(null)
   const [invoice, setInvoice] = useState<Invoice | null>(null)
   const [status, setStatus] = useState<string>("idle")
+
+  async function pollForInvoice(key: string): Promise<Invoice>{
+    for (let i = 0; i < 20; i++){
+      const res = await fetch(`${API}/invoices`)
+      const invoices: Invoice[] = await res.json()
+
+      const match = invoices.find(inv => inv.invoiceId === key)
+      if (match){
+        return match
+      }
+      await new Promise(r => setTimeout(r, 2000))
+    }
+    throw new Error("timed out")
+  }
+
+  async function handleUpload(){
+    if (!file) return
+    try{
+      setStatus("uploading")
+      const res = await fetch(`${API}/uploads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({ filename: file.name}),
+      })
+      const { url, key } = await res.json()
+
+      await fetch(url, {method: "PUT", body: file })
+      setStatus("processing")
+      const result = await pollForInvoice(key)
+      setInvoice(result)
+      setStatus("done")
+    }
+    catch{
+      setStatus("error")
+    }
+  }
 
   return (
     <>
