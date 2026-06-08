@@ -52,6 +52,36 @@ function App() {
       <input type="file" onChange={e=> setFile(e.target.files?.[0] ?? null)}/>
       <button onClick={handleUpload} disabled={!file}>Upload</button>
       <p>{status}</p>
+      {invoice && (
+        <div>
+          <h2>{invoice.vendor}</h2>
+          <p>Status: {invoice.status}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Tax Rate</th>
+                <th>Tax</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoice.line_items.map((item, i) => (
+                <tr key={i}>
+                  <td>{item.description}</td>
+                  <td>{item.category}</td>
+                  <td>{item.amount}</td>
+                  <td>{item.tax_rate}</td>
+                  <td>{item.tax_amount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p>Total tax: {invoice.total_tax}</p>
+          {invoice.override_reason && <p>Override: {invoice.override_reason}</p>}
+        </div>
+      )}
     </>
   )
 }
